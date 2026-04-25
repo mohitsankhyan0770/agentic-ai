@@ -42,7 +42,6 @@ agentic-ai-system/
 │── critic.py       # Response evaluation  
 │── memory.py       # Vector memory system  
 │── test_llm.py     # LLM test script  
-│── output.txt      # Saved outputs  
 │── README.md  
 
 
