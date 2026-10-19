@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# runtime data
+workspace/
+.agent_memory/
+runs/
+evals/results/*.json
+!evals/results/.gitkeep
