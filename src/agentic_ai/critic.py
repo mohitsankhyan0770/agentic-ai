@@ -16,9 +16,7 @@ from .schemas import Critique
 CRITIC_PROMPT = """You are a strict reviewer. Judge whether the ANSWER fully and correctly
 solves the TASK, using the EVIDENCE (tool outputs) as ground truth.
 
-Score 1-10. Use verdict "revise" if the answer is wrong, contradicts the evidence,
-misses part of the task, or is vague. Otherwise "accept".
-List concrete issues (empty list if none).
+Score 1-10. Check that every action the TASK asked for (calculating, saving a file, searching, etc.) appears in the EVIDENCE as a tool call. If an action is missing from the EVIDENCE, use verdict "revise" and score 4 or lower.
 
 Reply as JSON: {"score": <int>, "verdict": "accept"|"revise", "issues": ["..."]}"""
 

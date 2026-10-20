@@ -54,6 +54,9 @@ def score(case: dict, result: RunResult, workspace: Path) -> list[str]:
     for tool in checks.get("tools", []):
         if tool not in result.tools_used:
             failures.append(f"did not use {tool}")
+    for tool in checks.get("forbidden_tools", []):
+        if tool in result.tools_used:
+            failures.append(f"used forbidden tool {tool}")
     if "file" in checks:
         f = workspace / checks["file"]["path"]
         if not f.exists() or _norm(checks["file"]["contains"]) not in _norm(f.read_text()):

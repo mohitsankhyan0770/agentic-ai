@@ -1,5 +1,5 @@
 [
-  {"id": "math-basic", "task": "What is 17 multiplied by 23?", "checks": {"contains": ["391"], "tools": ["calculator"]}},
+  {"id": "math-basic", "task": "What is 17 multiplied by 23?", "checks": {"contains": ["391"], "tools": ["calculator"], "forbidden_tools": ["write_file", "read_file"]}},
   {"id": "math-multi", "task": "A laptop costs 54,999 rupees. With 18% GST added, what is the total price?", "checks": {"contains": ["64898"], "tools": ["calculator"]}},
   {"id": "math-sqrt", "task": "What is the square root of 1764 plus 8?", "checks": {"contains": ["50"], "tools": ["calculator"]}},
   {"id": "file-write", "task": "Write the text 'hello agent' to a file called greet.txt", "checks": {"file": {"path": "greet.txt", "contains": "hello agent"}, "tools": ["write_file"]}},

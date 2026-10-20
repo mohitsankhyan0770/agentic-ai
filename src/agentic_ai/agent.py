@@ -27,11 +27,16 @@ Available tools (name, description, args):
 
 Rules:
 - Use the calculator for any arithmetic; never do math in your head.
+- Only use tools the task actually needs. Never write or read files unless the user asks for it.
+- Example: for "What is 6*7?" call calculator, see 42, then reply
+  {{"thought": "got it", "action": "final_answer", "action_input": {{}}, "answer": "6*7 = 42"}}
 - Use web_search for facts that may be recent or that you are unsure of.
 - After each action you will receive an Observation. Use it; do not repeat the same call.
 - If a tool returns ERROR, fix the arguments or try another approach.
 - When you have enough information, reply with action "final_answer" and put the
   complete answer for the user in "answer". Base it on the observations.
+- The context may contain results of earlier steps. Reuse them; never recompute them. If the task is to save something, call write_file with the value from the context.
+
 """
 
 FORCE_FINAL_PROMPT = (
@@ -111,7 +116,15 @@ class Agent:
                 ok=ok,
                 ms=round(ms, 1),
             )
-            messages.append({"role": "user", "content": f"Observation: {observation}"})
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"Observation: {observation}\n\n"
+                    "Check the task: has EVERY action it asks for been done (for example both "
+                    "calculating AND saving to a file)? If yes, reply with action final_answer. "
+                    "If something is still missing, call the tool for that missing part.",
+                }
+            )
 
         # Budget exhausted: degrade gracefully instead of returning nothing.
         self._emit("budget_exhausted", task=task, steps=len(steps))

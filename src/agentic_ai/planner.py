@@ -11,13 +11,19 @@ from .llm import LLM, LLMError
 from .schemas import Plan
 
 PLANNER_PROMPT = """You are a planner for a tool-using agent.
-The agent's tools: {tools}.
+Available tools (for information only): {tools}.
 
-Split the user's task into the MINIMUM number of ordered, self-contained sub-tasks
-(at most {max_steps}). Each sub-task must be actionable by the agent on its own.
+Break the task into the MINIMUM number of steps (at most {max_steps}).
+Each step must be a full instruction in plain English. NEVER output a bare tool name as a step.
 
-If the task can be done directly in one go (a question, a single calculation,
-a greeting), return exactly one step: the task itself, unchanged.
+Most tasks need only ONE step. If the task is a single question or calculation, return exactly one
+step that repeats the task unchanged. Only split when the user asks for several distinct actions.
+
+Examples:
+Task: What is 17 * 23?
+{{"steps": ["What is 17 * 23?"]}}
+Task: Calculate 125 * 8 and save it to result.txt
+{{"steps": ["Calculate 125 * 8", "Save the result to result.txt"]}}
 
 Reply as JSON: {{"steps": ["...", "..."]}}"""
 
@@ -38,4 +44,7 @@ class Planner:
         except LLMError:
             return Plan(steps=[task])  # planning is an optimisation; never block on it
         steps = [s.strip() for s in plan.steps if s and s.strip()][: self.max_steps]
-        return Plan(steps=steps or [task])
+        names = {n.lower() for n in self.tool_names}
+        if not steps or any(s.lower() in names for s in steps):
+            return Plan(steps=[task])  # a step that is just a tool name means the plan is junk
+        return Plan(steps=steps)

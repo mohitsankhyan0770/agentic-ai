@@ -68,7 +68,7 @@ class Orchestrator:
         # 2. Plan
         steps = [task]
         if s.enable_planner:
-            steps = Planner(self.llm, self.tools.names(), s.max_plan_steps).plan(task, memory_ctx).steps
+            steps = Planner(self.llm, self.tools.names(), s.max_plan_steps).plan(task).steps
             tracer.emit("plan", steps=steps)
 
         # 3. Execute
