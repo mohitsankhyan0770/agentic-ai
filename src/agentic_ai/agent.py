@@ -35,7 +35,8 @@ Rules:
 - If a tool returns ERROR, fix the arguments or try another approach.
 - When you have enough information, reply with action "final_answer" and put the
   complete answer for the user in "answer". Base it on the observations.
-- The context may contain results of earlier steps. Reuse them; never recompute them. If the task is to save something, call write_file with the value from the context.
+- The context may contain results of earlier steps. Reuse them; never recompute them. 
+  If the task is to save something, call write_file with the value from the context.
 
 """
 
