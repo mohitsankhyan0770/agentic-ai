@@ -75,14 +75,24 @@ python evals/run_evals.py --offline            # skip the web task
 python evals/run_evals.py --offline --ablate   # full vs no-planner vs no-critic vs bare
 ```
 
-| Config            | Model        | Pass rate   | Median latency | Avg steps |
-|-------------------|--------------|-------------|---------------|-----------|
-| full (memory off) | llama3.2:3b  | 89% (8/9)   | 10.1s         | 3.8       |
+| Config                  | Pass rate   | Median latency | Avg steps |
+|-------------------------|-------------|---------------|-----------|
+| full (planner + critic) | 89% (8/9)   | 9.8s          | 3.8       |
+| no planner              | 100% (9/9)  | 8.0s          | 2.6       |
+| no critic               | 89% (8/9)   | 6.2s          | 3.8       |
+| bare (no planner, no critic) | 100% (9/9) | 5.1s     | 2.6       |
 
-**Caveats:** 9 tasks, one run, so treat the numbers as indicative. The one failure (`math-multi`)
-was a real agent error: the planner split a single calculation into two steps, and the model
-mistyped a number between them (53999 instead of 54999). The critic flagged the answer, but its
-revision introduced a different wrong number.
+Model: `llama3.2:3b` on CPU, memory disabled, 9 tasks, one run each.
+
+**Findings.** With a 3B model the planner and critic did not pay for themselves:
+
+- The planner lowered accuracy. It split a single calculation (`math-multi`) into two steps, and the model
+  mistyped a number between them (53999 instead of 54999).
+- The critic added about 3.5s per task with no accuracy gain.
+
+**Caveats.** Only 9 tasks, mostly one or two steps, so this is indicative, not conclusive. The suite does
+not test long multi-step tasks, where a planner or critic may help, or larger models. Extending the suite
+and re-running with `qwen2.5:7b` is the next step.
 
 ## Engineering decisions
 
