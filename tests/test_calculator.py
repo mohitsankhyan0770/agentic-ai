@@ -46,3 +46,7 @@ def test_rejects_resource_exhaustion():
 def test_division_by_zero():
     with pytest.raises(CalculatorError, match="zero"):
         safe_eval("1 / 0")
+
+
+def test_thousand_separators():
+    assert safe_eval("54,999 * 0.18") == pytest.approx(9899.82)

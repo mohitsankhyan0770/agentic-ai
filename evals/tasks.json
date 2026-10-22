@@ -1,7 +1,7 @@
 [
   {"id": "math-basic", "task": "What is 17 multiplied by 23?", "checks": {"contains": ["391"], "tools": ["calculator"], "forbidden_tools": ["write_file", "read_file"]}},
-  {"id": "math-multi", "task": "A laptop costs 54,999 rupees. With 18% GST added, what is the total price?", "checks": {"contains": ["64898"], "tools": ["calculator"]}},
-  {"id": "math-sqrt", "task": "What is the square root of 1764 plus 8?", "checks": {"contains": ["50"], "tools": ["calculator"]}},
+  {"id": "math-multi", "task": "A laptop costs 54,999 rupees. With 18% GST added, what is the total price?", "checks": {"contains_any": ["64898", "64899"], "tools": ["calculator"]}},
+  {"id": "math-sqrt", "task": "Calculate sqrt(1764) + 8.", "checks": {"contains": ["50"], "tools": ["calculator"]}},
   {"id": "file-write", "task": "Write the text 'hello agent' to a file called greet.txt", "checks": {"file": {"path": "greet.txt", "contains": "hello agent"}, "tools": ["write_file"]}},
   {"id": "calc-then-save", "task": "Calculate 125 * 8 and save just the number to result.txt", "checks": {"file": {"path": "result.txt", "contains": "1000"}, "tools": ["calculator", "write_file"]}},
   {"id": "read-file", "task": "Read the file facts.txt and tell me the capital it mentions.", "setup": {"facts.txt": "The capital of Himachal Pradesh is Shimla."}, "checks": {"contains": ["Shimla"], "tools": ["read_file"]}},

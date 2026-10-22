@@ -63,7 +63,11 @@ class Orchestrator:
                 tracer.emit("error", where="memory.search", message=str(exc))
             if memories:
                 tracer.emit("memory_recall", memories=memories)
-        memory_ctx = "\n".join(f"- {m}" for m in memories)
+
+        memory_ctx = ""
+        if memories:
+            lines = "\n".join(f"- {m}" for m in memories)
+            memory_ctx = f"Past sessions (background only; do NOT redo or continue these tasks):\n{lines}"
 
         # 2. Plan
         steps = [task]

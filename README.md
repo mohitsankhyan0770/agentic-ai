@@ -4,29 +4,12 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-An LLM agent that runs **entirely on your machine** via [Ollama](https://ollama.com). It plans multi-step
+An LLM agent that runs **locally** via [Ollama](https://ollama.com). It plans multi-step
 tasks, chains tools in a ReAct loop, checks its own answers against the tool evidence, and remembers past
 conversations in a persistent vector store. Every run produces a structured trace, and a small eval suite
 measures how well it actually works.
-
-```text
-You › Calculate 125 * 8 and save just the number to result.txt
-📋 Plan
-   1. Calculate 125 * 8
-   2. Save the result to result.txt
-▶ Step 1/2: Calculate 125 * 8
-   💭 I need to multiply, so I'll use the calculator
-   🔧 calculator({"expression": "125 * 8"}) 0.1ms
-   ↳ 1000
-▶ Step 2/2: Save the result to result.txt
-   🔧 write_file({"path": "result.txt", "content": "1000"}) 0.4ms
-   ↳ Wrote 4 chars to result.txt
-🔍 critic: 9/10 accept
-╭─ Answer ─────────────────────────────────────────╮
-│ 125 × 8 = 1000, saved to result.txt.             │
-╰──────────────────────────────────────────────────╯
-```
-<sub>Illustrative output; exact wording depends on the model.</sub>
+Web search is the only part that needs internet.
+![Agent run: plan, tool calls, critic and answer](docs/demo.png)
 
 ## Architecture
 
@@ -92,12 +75,14 @@ python evals/run_evals.py --offline            # skip the web task
 python evals/run_evals.py --offline --ablate   # full vs no-planner vs no-critic vs bare
 ```
 
-| Config | Model | Pass rate | Median latency | Avg steps |
-|---|---|---|---|---|
-| full | _run the evals and fill in_ | | | |
-| no-planner | | | | |
-| no-critic | | | | |
-| bare | | | | |
+| Config            | Model        | Pass rate   | Median latency | Avg steps |
+|-------------------|--------------|-------------|---------------|-----------|
+| full (memory off) | llama3.2:3b  | 89% (8/9)   | 10.1s         | 3.8       |
+
+**Caveats:** 9 tasks, one run, so treat the numbers as indicative. The one failure (`math-multi`)
+was a real agent error: the planner split a single calculation into two steps, and the model
+mistyped a number between them (53999 instead of 54999). The critic flagged the answer, but its
+revision introduced a different wrong number.
 
 ## Engineering decisions
 
@@ -156,6 +141,16 @@ class WeatherArgs(BaseModel):
 
 registry.register(Tool("weather", "Current weather for a city.", WeatherArgs, get_weather))
 ```
+
+## What I learned from running it
+
+Running a real 3B model against the eval suite found bugs the unit tests could not:
+
+- **Memory derailed the agent.** Recalled past sessions were treated as new instructions, so the agent
+   redid old tasks. Fix: label memory as background only and raise the similarity threshold.
+- **The calculator rejected `54,999`.** Python reads that as a tuple. Fix: strip thousands separators.
+- **Splitting tasks creates copy errors.** Small models mistype numbers between steps.
+- **A critic can make answers worse.** It detected wrong answers, but its rewrites invented new numbers.
 
 ## Limitations and roadmap
 

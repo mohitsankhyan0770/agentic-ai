@@ -10,6 +10,7 @@ from __future__ import annotations
 import ast
 import math
 import operator
+import re
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -64,6 +65,8 @@ def _eval(node: ast.AST) -> float | int:
 
 def safe_eval(expression: str) -> float | int:
     expr = expression.replace("^", "**").replace("×", "*").replace("÷", "/").strip()
+    # Models often write numbers like 54,999; Python would read that as a tuple.
+    expr = re.sub(r"(?<![\d.])\d{1,3}(?:,\d{3})+(?!\d)", lambda m: m.group(0).replace(",", ""), expr)
     if not expr:
         raise CalculatorError("Empty expression")
     try:
