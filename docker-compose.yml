@@ -1,0 +1,35 @@
+services:
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      retries: 12
+
+  model-setup:
+    image: ollama/ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c", "ollama pull llama3.2:3b && ollama pull nomic-embed-text"]
+
+  agent:
+    build: .
+    depends_on:
+      model-setup:
+        condition: service_completed_successfully
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      AGENT_MODEL: llama3.2:3b
+    ports:
+      - "8000:8000"
+    volumes:
+      - agent-data:/data
+
+volumes:
+  ollama:
+  agent-data:

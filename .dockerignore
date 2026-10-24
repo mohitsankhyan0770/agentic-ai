@@ -1,0 +1,10 @@
+.venv
+.git
+.env
+workspace
+.agent_memory
+runs
+__pycache__
+.pytest_cache
+.ruff_cache
+evals/results

@@ -64,6 +64,18 @@ uvicorn agentic_ai.api:app --reload             # API → http://localhost:8000/
 curl -X POST localhost:8000/run -H 'content-type: application/json' -d '{"task": "What is 17*23?"}'
 ```
 
+
+## Run with Docker
+
+No Python or Ollama install needed:
+
+```bash
+docker compose up --build
+curl -X POST localhost:8000/run -H 'content-type: application/json' -d '{"task": "What is 17*23?"}'
+```
+
+The first start downloads the models (about 2 GB). The API has no authentication, so keep it on localhost.
+
 ## Evaluation
 
 `evals/tasks.json` holds tasks with automatic checks (answer contains X, tool Y was used, file Z has the right
